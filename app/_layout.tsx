@@ -20,6 +20,7 @@ const tokenCache = {
       return null
     }
   },
+  
   async saveToken(key: string, value: string) {
     try {
       return SecureStore.setItemAsync(key, value)
@@ -44,7 +45,7 @@ export default function RootLayout() {
     'outfit-regular': require('../assets/fonts/Outfit-Regular.ttf')
   });
   return (
-    <ClerkProvider publishableKey={publishableKey}>
+    <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
         <SignedIn>
           <Stack screenOptions={{headerShown: false}}>
             <Stack.Screen name="(tabs)"/>
