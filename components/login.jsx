@@ -53,7 +53,7 @@ export default function LoginScreen() {
 
   return (
     <LinearGradient
-      colors={['#4c669f', '#3b5998', '#192f6a']}
+      colors={[Colors.PRIMARY, Colors.ICON_BG_COLOR, Colors.PRIMARY]}
       style={styles.container}
     >
       <Animated.View style={[styles.content, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
