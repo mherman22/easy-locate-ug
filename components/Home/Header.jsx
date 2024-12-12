@@ -1,33 +1,74 @@
-import { View, Text, Image, TextInput } from 'react-native';
+import { View, Text, Image, TextInput, Dimensions, StyleSheet } from 'react-native';
 import React from 'react';
 import { useUser } from '@clerk/clerk-expo';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from '../../constants/Colors';
 
+const { width } = Dimensions.get('window');
+
 export default function Header() {
     const user = useUser();
-  return (
-    <View style={{padding:10, paddingTop: 15, backgroundColor: Colors.PRIMARY, borderBottomLeftRadius: 20, borderBottomRightRadius: 20}}>
-      <View style={{display: 'flex', flexDirection: 'row', gap: 10, alignItems: 'center'}}>
-        <Image source={{uri: user?.user.imageUrl}} style={{width: 40,height: 40, borderRadius:99,}}/>
-        <View>
-            <Text style={{color: '#fff'}}>Welcome,</Text>
-            <Text style={{fontFamily: 'outfit-medium', color: '#fff'}}>{user?.user.firstName}</Text>
+    
+    return (
+      <View style={styles.container}>
+        <View style={styles.profileContainer}>
+          <Image 
+            source={{uri: user?.user.imageUrl}} 
+            style={styles.profileImage}
+          />
+          <View>
+            <Text style={styles.welcomeText}>Welcome,</Text>
+            <Text style={styles.nameText}>{user?.user.firstName}</Text>
+          </View>
+        </View>
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={24} color={Colors.PRIMARY} />
+          <TextInput 
+            placeholder='Search ...'
+            style={styles.searchInput}
+          />
         </View>
       </View>
-      <View style=
-                {{display: 'flex', 
-                flexDirection: 'row',
-                alignItems: 'center', 
-                backgroundColor: '#fff', 
-                gap: 10,
-                padding: 3, 
-                marginVertical: 16, 
-                marginTop: 15, 
-                borderRadius: 8}}>
-        <Ionicons name="search" size={18} color={Colors.PRIMARY} />
-        <TextInput placeholder='Search ...'/>
-      </View>
-    </View>
-  )
+    );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    padding: width * 0.025,
+    paddingTop: width * 0.04,
+    backgroundColor: Colors.PRIMARY,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  profileContainer: {
+    flexDirection: 'row',
+    gap: width * 0.025,
+    alignItems: 'center',
+  },
+  profileImage: {
+    width: width * 0.15,
+    height: width * 0.15,
+    borderRadius: 99,
+  },
+  welcomeText: {
+    color: '#fff',
+  },
+  nameText: {
+    fontFamily: 'outfit-medium',
+    color: '#fff',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    gap: width * 0.025,
+    padding: width * 0.01,
+    marginVertical: width * 0.04,
+    marginTop: width * 0.04,
+    borderRadius: 8,
+  },
+  searchInput: {
+    flex: 1,
+  },
+});

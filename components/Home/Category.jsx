@@ -18,14 +18,13 @@ export default function Category() {
         const querySnapshot = await getDocs(qry);
 
         querySnapshot.forEach(dc => {
-            console.log(dc.data());
             setCategory(prev => [...prev, dc.data()]);
         })
     }
   return (
     <View>
-      <View style={{padding: 10, display:'flex', flexDirection:'row',justifyContent:'space-between',marginTop: 5}}>
-        <Text style={{paddingLeft: 10, fontFamily: 'outfit-bold', fontSize: 15}}>Category</Text>
+      <View style={{paddingLeft: 20, marginBottom: 5,display:'flex', flexDirection:'row',justifyContent:'space-between',marginTop: 5}}>
+        <Text style={{paddingLeft: 10, fontFamily: 'outfit-bold', fontSize: 15}}>business Categories</Text>
         <Text style={{color: Colors.PRIMARY, fontFamily: 'outfit-medium'}}>View All</Text>
       </View>
       <FlatList 
