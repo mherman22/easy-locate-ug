@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     marginBottom: width * 0.012,
   },
   sliderImage: {
-    width: width * 0.55, // 75% of screen width
+    width: width * 0.75, // 75% of screen width
     height: width * 0.375, // Maintaining 2:1 aspect ratio
     borderRadius: 15,
     marginRight: width * 0.037,

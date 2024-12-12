@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput, Dimensions, StyleSheet } from 'react-native';
+import { View, Text, Image, TextInput, Dimensions, StyleSheet, SafeAreaView } from 'react-native';
 import React from 'react';
 import { useUser } from '@clerk/clerk-expo';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -10,29 +10,35 @@ export default function Header() {
     const user = useUser();
     
     return (
-      <View style={styles.container}>
-        <View style={styles.profileContainer}>
-          <Image 
-            source={{uri: user?.user.imageUrl}} 
-            style={styles.profileImage}
-          />
-          <View>
-            <Text style={styles.welcomeText}>Welcome,</Text>
-            <Text style={styles.nameText}>{user?.user.firstName}</Text>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
+          <View style={styles.profileContainer}>
+            <Image 
+              source={{uri: user?.user.imageUrl}} 
+              style={styles.profileImage}
+            />
+            <View>
+              <Text style={styles.welcomeText}>Welcome,</Text>
+              <Text style={styles.nameText}>{user?.user.firstName}</Text>
+            </View>
+          </View>
+          <View style={styles.searchContainer}>
+            <Ionicons name="search" size={24} color={Colors.PRIMARY} />
+            <TextInput 
+              placeholder='Search ...'
+              style={styles.searchInput}
+            />
           </View>
         </View>
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={24} color={Colors.PRIMARY} />
-          <TextInput 
-            placeholder='Search ...'
-            style={styles.searchInput}
-          />
-        </View>
-      </View>
+      </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    backgroundColor: Colors.PRIMARY,
+    borderRadius: 20,
+  },
   container: {
     width: '100%',
     padding: width * 0.025,
@@ -47,8 +53,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   profileImage: {
-    width: width * 0.15,
-    height: width * 0.15,
+    width: width * 0.1,
+    height: width * 0.1,
     borderRadius: 99,
   },
   welcomeText: {
@@ -63,7 +69,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     gap: width * 0.025,
-    padding: width * 0.01,
+    padding: width * 0.001,
     marginVertical: width * 0.04,
     marginTop: width * 0.04,
     borderRadius: 8,
