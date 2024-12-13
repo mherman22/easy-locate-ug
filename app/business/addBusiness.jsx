@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, Image, TouchableOpacity, TextInput, ScrollView, StyleSheet, Dimensions, Platform } from 'react-native'
-import { useNavigation } from 'expo-router'
-import Colors from '../../constants/Colors'
+import { View, Text, Image, TouchableOpacity, TextInput, ScrollView, StyleSheet, Dimensions, Platform, Alert } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
 import * as ImagePicker from 'expo-image-picker'
 import RNPickerSelect from 'react-native-picker-select'
 import { collection, getDocs, query } from 'firebase/firestore'
-import { db, storage } from '../../config/FirebaseConfig'
-import { ref, uploadBytes } from 'firebase/storage'
+import { db } from '../../config/FirebaseConfig'
+import Colors from '../../constants/Colors'
+import { HOST_WITH_PORT } from '../../config/localhost'
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 
@@ -15,12 +15,12 @@ export default function addBusiness() {
     const [category, setCategory] = useState([])
     const navigation = useNavigation()
 
-    const [name, setName] = useState(null)
-    const [location, setLocation] = useState(null)
-    const [contact, setContact] = useState(null)
-    const [categorry, setCategorry] = useState(null)
-    const [about, setAbout] = useState(null)
-    const [website, setWebsite] = useState(null)
+    const [name, setName] = useState('')
+    const [location, setLocation] = useState('')
+    const [contact, setContact] = useState('')
+    const [selectedCategory, setSelectedCategory] = useState(null)
+    const [about, setAbout] = useState('')
+    const [website, setWebsite] = useState('')
 
     useEffect(() => {
         getCategory()
@@ -28,35 +28,74 @@ export default function addBusiness() {
             headerTitle: 'Add New Business',
             headerShown: true
         })
-    }, []);
+    }, [])   
 
     const onAddNewBusiness = async () => {
       try {
-        if (!image) {
-          throw new Error('No image selected. Please upload an image.');
+        if (!image || !name || !location || !contact || !about || !website || !selectedCategory) {
+          throw new Error('Please fill in all required fields')
         }
     
-        const fileName = `${Date.now().toString()}.jpg`;
+        const formData = new FormData()
     
-        const response = await fetch(image);
+        const imageUri = image
+        const filename = imageUri.split('/').pop()
+        const match = /\.(\w+)$/.exec(filename)
+        const type = match ? `image/${match[1]}` : 'image/jpeg'
+    
+        formData.append('image', {
+          uri: imageUri,
+          name: filename || 'image.jpg',
+          type,
+        })
+    
+        const businessData = {
+          name,
+          websiteUrl: website,
+          location,
+          about,
+          contact,
+          category: selectedCategory,
+        }
+    
+        formData.append('business', JSON.stringify(businessData))
+        const response = await fetch(`${HOST_WITH_PORT}/api/businesses`, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'multipart/form-data',
+          },
+          body: formData
+        })
     
         if (!response.ok) {
-          throw new Error('Failed to fetch the image. Please try again.');
+          const errorData = await response.text()
+          throw new Error(errorData || 'Failed to save business data')
         }
     
-        const blob = await response.blob();
+        const savedBusiness = await response.json()
+        console.log('Business saved successfully:', savedBusiness)
+        
+        resetForm()
     
-        const imageRef = ref(storage, `easylocateug/${fileName}`);
-    
-        const uploadResult = await uploadBytes(imageRef, blob);
-    
-        console.log('Image uploaded successfully!', uploadResult);
-        alert('Business added successfully!');
+        Alert.alert('Success', 'Business added successfully!', [
+          { text: 'OK', onPress: () => navigation.goBack() }
+        ])
       } catch (error) {
-        console.error('Error adding new business:', error.message);
-        alert(`Failed to add business: ${error.message}`);
+        console.error('Error adding new business:', error.message)
+        Alert.alert('Error', `Failed to add business: ${error.message}`)
       }
-    };    
+    }
+
+    const resetForm = () => {
+      setImage(null)
+      setName('')
+      setLocation('')
+      setContact('')
+      setSelectedCategory(null)
+      setAbout('')
+      setWebsite('')
+    }
 
     const getCategory = async () => {
         setCategory([])
@@ -73,8 +112,9 @@ export default function addBusiness() {
 
     const pictureImport = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ['images', 'videos'],
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
+            aspect: [1, 1],
             quality: 1,
         })
 
@@ -85,52 +125,58 @@ export default function addBusiness() {
 
     return (
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.container}>
-          <Text style={{fontFamily: 'outfit-bold', fontSize: 25}}>Add New Business</Text>
+            <Text style={styles.title}>Add New Business</Text>
             <Text style={styles.subtitle}>Please add all the required details to create a new business</Text>
             <TouchableOpacity style={styles.imageContainer} onPress={pictureImport}>
                 {!image ? (
-                    <Image source={require('../../assets/images/camera (1).png')} style={styles.cameraIcon} />
+                    <Image source={require('../../assets/images/camera.png')} style={styles.cameraIcon} />
                 ) : (
                     <Image source={{ uri: image }} style={styles.businessImage} />
                 )}
             </TouchableOpacity>
             <View style={styles.formContainer}>
                 <TextInput
+                    value={name}
                     onChangeText={setName}
                     placeholder='Business Name'
                     style={styles.input}
                 />
                 <TextInput
+                    value={location}
                     onChangeText={setLocation}
                     placeholder='Location'
                     style={styles.input}
                 />
                 <TextInput
+                    value={contact}
                     onChangeText={setContact}
                     placeholder='Contact'
                     style={styles.input}
                 />
                 <TextInput
+                    value={website}
                     onChangeText={setWebsite}
                     placeholder='Website Url'
                     style={styles.input}
                 />
                 <TextInput
+                    value={about}
                     onChangeText={setAbout}
                     multiline
-                    numberOfLines={100}
+                    numberOfLines={5}
                     placeholder='About'
                     style={[styles.input, styles.textArea]}
                 />
                 <View style={styles.pickerContainer}>
                     <RNPickerSelect
                         placeholder={{ label: 'Select a Category...', value: null }}
-                        onValueChange={(value) => setCategorry(value)}
+                        onValueChange={(value) => setSelectedCategory(value)}
                         items={category}
                         style={pickerSelectStyles}
+                        value={selectedCategory}
                     />
                 </View>
-                <TouchableOpacity onPress={() => onAddNewBusiness()} style={styles.button}>
+                <TouchableOpacity onPress={onAddNewBusiness} style={styles.button}>
                     <Text style={styles.buttonText}>Add New Business</Text>
                 </TouchableOpacity>
             </View>
@@ -144,10 +190,14 @@ const styles = StyleSheet.create({
         padding: SCREEN_WIDTH * 0.05,
         backgroundColor: Colors.WHITE,
     },
+    title: {
+        fontFamily: 'outfit-bold',
+        fontSize: SCREEN_WIDTH * 0.06,
+        marginBottom: SCREEN_HEIGHT * 0.01,
+    },
     subtitle: {
         fontFamily: 'outfit-regular',
         color: Colors.GREY,
-        marginTop: SCREEN_HEIGHT * 0.01,
         fontSize: SCREEN_WIDTH * 0.04,
         marginBottom: SCREEN_HEIGHT * 0.02,
     },
