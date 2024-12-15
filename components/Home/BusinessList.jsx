@@ -1,37 +1,44 @@
-import { View, Text, FlatList, StyleSheet, Dimensions } from 'react-native'
+import { View, Text, FlatList, StyleSheet, Dimensions, Alert, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
-import { collection, getDocs, query } from 'firebase/firestore'
-import { db } from '../../config/FirebaseConfig'
 import Colors from '../../constants/Colors';
 import BusinessListChild from './BusinessListChild';
+import { HOST_WITH_PORT } from '../../config/localhost';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const { width } = Dimensions.get('window');
 
 export default function BusinessList() {
-    const [businessList, setBusinessList] = React.useState([]);
+    const [businesses, setBusinesses] = React.useState([]);
+
+    const fetchBusinesses = async () => {
+        try {
+            const response = await fetch(`${HOST_WITH_PORT}/api/businesses`);
+            if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
+            }
+            const data = await response.json();
+            console.log("fetched business: " + JSON.stringify(data));
+            setBusinesses(data);
+        } catch (err) {
+            console.error('Error fetching businesses:', err.message)
+            Alert.alert('Error', `Failed to add business: ${err.message}`)
+        }
+    };
 
     React.useEffect(() => {
-        getBusinessList();
+        fetchBusinesses();
     }, []);
-
-    const getBusinessList = async () => {
-        setBusinessList([]);
-        const qry = query(collection(db, 'BusinessList'));
-        const querySnapShot = await getDocs(qry);
-
-        querySnapShot.forEach(dc => {
-            setBusinessList(prev => [...prev, dc.data()]);
-        })
-    }
 
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
                 <Text style={styles.headerText}>Popular Businesses</Text>
-                <Text style={styles.viewAllText}>View All</Text>
+                <TouchableOpacity onPress={fetchBusinesses}>
+                    <Ionicons name="reload" size={16} color="black" />
+                </TouchableOpacity>
             </View>
             <FlatList 
-                data={businessList} 
+                data={businesses} 
                 renderItem={({item, index}) => (
                     <BusinessListChild key={index} business={item}/> 
                 )}

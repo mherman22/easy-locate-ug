@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, Image, TouchableOpacity, TextInput, ScrollView, StyleSheet, Dimensions, Platform, Alert } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
-import * as ImagePicker from 'expo-image-picker'
-import RNPickerSelect from 'react-native-picker-select'
-import { collection, getDocs, query } from 'firebase/firestore'
-import { db } from '../../config/FirebaseConfig'
-import Colors from '../../constants/Colors'
-import { HOST_WITH_PORT } from '../../config/localhost'
+import { View, Text, Image, TouchableOpacity, TextInput, ScrollView, StyleSheet, Dimensions, Alert } from 'react-native'
+import { useNavigation } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
+import RNPickerSelect from 'react-native-picker-select';
+import { collection, getDocs, query } from 'firebase/firestore';
+import { db } from '../../config/FirebaseConfig';
+import Colors from '../../constants/Colors';
+import { HOST_WITH_PORT } from '../../config/localhost';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 
@@ -63,44 +63,10 @@ export default function addBusiness() {
             })
         );
 
-        // Send the request
         const response = await fetch(`${HOST_WITH_PORT}/api/businesses`, {
             method: 'POST',
             body: formData,
         });
-
-    
-        // const formData = new FormData()
-    
-        // const imageUri = image
-        // const filename = imageUri.split('/').pop()
-        // const match = /\.(\w+)$/.exec(filename)
-        // const type = match ? `image/${match[1]}` : 'image/jpeg'
-    
-        // formData.append('image', {
-        //   uri: imageUri,
-        //   name: filename || 'image.jpg',
-        //   type,
-        // })
-    
-        // const businessData = {
-        //   name,
-        //   websiteUrl: website,
-        //   location,
-        //   about,
-        //   contact,
-        //   category: selectedCategory,
-        // }
-    
-        // formData.append('business', JSON.stringify(businessData))
-        // const response = await fetch(`${HOST_WITH_PORT}/api/businesses`, {
-        //   method: 'POST',
-        //   headers: {
-        //     'Accept': 'application/json',
-        //     'Content-Type': 'multipart/form-data',
-        //   },
-        //   body: formData
-        // })
     
         if (!response.ok) {
           const errorData = await response.text()
@@ -146,7 +112,7 @@ export default function addBusiness() {
 
     const pictureImport = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: 'images',
             allowsEditing: true,
             aspect: [1, 1],
             quality: 1,

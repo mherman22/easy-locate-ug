@@ -1,13 +1,15 @@
 import { View, Text, Image, StyleSheet, Dimensions } from 'react-native'
 import React from 'react'
 import Colors from '../../constants/Colors'
+import { HOST_WITH_PORT } from '../../config/localhost';
 
 const { width } = Dimensions.get('window');
 
 export default function BusinessListChild({business}) {
+    const fullImageUrl = `${HOST_WITH_PORT}${business.imageUrl}`;
     return (
         <View style={styles.container}>
-            <Image source={{uri: business.imageUrl}} style={styles.image}/>
+            <Image source={{uri: fullImageUrl}} style={styles.image}/>
             <View style={styles.infoContainer}>
                 <Text style={styles.businessName}>{business.name}</Text>
                 <Text style={styles.location}>{business.location}</Text>

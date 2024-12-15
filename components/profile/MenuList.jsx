@@ -32,7 +32,7 @@ export default function MenuList() {
             id: 2,
             name: "My Business",
             icon: require('../../assets/images/EasyLocateUG-.png'),
-            path: ''
+            path: '/business/myBusiness'
         },
         {
             id: 3,
