@@ -35,38 +35,72 @@ export default function addBusiness() {
         if (!image || !name || !location || !contact || !about || !website || !selectedCategory) {
           throw new Error('Please fill in all required fields')
         }
-    
-        const formData = new FormData()
-    
-        const imageUri = image
-        const filename = imageUri.split('/').pop()
-        const match = /\.(\w+)$/.exec(filename)
-        const type = match ? `image/${match[1]}` : 'image/jpeg'
-    
-        formData.append('image', {
-          uri: imageUri,
-          name: filename || 'image.jpg',
-          type,
-        })
-    
-        const businessData = {
-          name,
-          websiteUrl: website,
-          location,
-          about,
-          contact,
-          category: selectedCategory,
+
+        const formData = new FormData();
+
+        if (image) {
+            const imageUri = image;
+            const filename = imageUri.split('/').pop();
+            const match = /\.(\w+)$/.exec(filename);
+            const type = match ? `image/${match[1]}` : 'application/octet-stream';
+
+            formData.append('image', {
+                uri: imageUri,
+                name: filename || 'image.jpg',
+                type,
+            });
         }
-    
-        formData.append('business', JSON.stringify(businessData))
+
+        formData.append(
+            'business',
+            JSON.stringify({
+                name,
+                websiteUrl: website,
+                location,
+                about,
+                contact,
+                category: selectedCategory,
+            })
+        );
+
+        // Send the request
         const response = await fetch(`${HOST_WITH_PORT}/api/businesses`, {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'multipart/form-data',
-          },
-          body: formData
-        })
+            method: 'POST',
+            body: formData,
+        });
+
+    
+        // const formData = new FormData()
+    
+        // const imageUri = image
+        // const filename = imageUri.split('/').pop()
+        // const match = /\.(\w+)$/.exec(filename)
+        // const type = match ? `image/${match[1]}` : 'image/jpeg'
+    
+        // formData.append('image', {
+        //   uri: imageUri,
+        //   name: filename || 'image.jpg',
+        //   type,
+        // })
+    
+        // const businessData = {
+        //   name,
+        //   websiteUrl: website,
+        //   location,
+        //   about,
+        //   contact,
+        //   category: selectedCategory,
+        // }
+    
+        // formData.append('business', JSON.stringify(businessData))
+        // const response = await fetch(`${HOST_WITH_PORT}/api/businesses`, {
+        //   method: 'POST',
+        //   headers: {
+        //     'Accept': 'application/json',
+        //     'Content-Type': 'multipart/form-data',
+        //   },
+        //   body: formData
+        // })
     
         if (!response.ok) {
           const errorData = await response.text()
