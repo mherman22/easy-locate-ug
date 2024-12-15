@@ -59,7 +59,7 @@ export default function LoginScreen() {
       <Animated.View style={[styles.content, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
         <View style={styles.logoContainer}>
           <Image
-            source={require('../assets/images/EasyLocateUG_transparent-.png')}
+            source={{uri: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo_transparent-jB4rAg8Fti26Kux2IpjuSElc8336XY.png"}}
             style={styles.logo}
             resizeMode="contain"
           />
