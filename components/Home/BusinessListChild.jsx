@@ -18,7 +18,7 @@ export default function BusinessListChild({business}) {
                         <Image source={require('../../assets/images/star.png')} style={styles.starIcon}/>
                         <Text style={styles.ratingText}>4.5</Text>
                     </View>
-                    <Text style={styles.categoryTag}>{business.category}</Text>
+                    <Text style={styles.categoryTag}>{business.category?.name}</Text>
                 </View>
             </View>
         </View>

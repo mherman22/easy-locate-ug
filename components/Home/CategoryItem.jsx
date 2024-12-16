@@ -1,14 +1,16 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native'
 import React from 'react'
 import Colors from '../../constants/Colors'
+import { HOST_WITH_PORT } from '../../config/localhost';
 
 const { width } = Dimensions.get('window');
 
 export default function CategoryItem({category, onCategoryPress}) {
+    const icon = `${HOST_WITH_PORT}${category.icon}`;
     return (
         <TouchableOpacity onPress={() => onCategoryPress(category)} style={styles.container}>
             <View style={styles.iconContainer}>
-                <Image source={{uri: category.icon}} style={styles.icon}/>
+                <Image source={{uri: icon}} style={styles.icon}/>
             </View>
             <Text style={styles.categoryName}>{category.name}</Text>
         </TouchableOpacity>

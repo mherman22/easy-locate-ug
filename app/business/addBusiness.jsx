@@ -3,8 +3,6 @@ import { View, Text, Image, TouchableOpacity, TextInput, ScrollView, StyleSheet,
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import RNPickerSelect from 'react-native-picker-select';
-import { collection, getDocs, query } from 'firebase/firestore';
-import { db } from '../../config/FirebaseConfig';
 import Colors from '../../constants/Colors';
 import { HOST_WITH_PORT } from '../../config/localhost';
 
@@ -12,7 +10,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window')
 
 export default function addBusiness() {
     const [image, setImage] = useState(null)
-    const [category, setCategory] = useState([])
+    const [categories, setCategories] = useState([])
     const navigation = useNavigation()
 
     const [name, setName] = useState('')
@@ -23,7 +21,7 @@ export default function addBusiness() {
     const [website, setWebsite] = useState('')
 
     useEffect(() => {
-        getCategory()
+        fetchCategories()
         navigation.setOptions({
             headerTitle: 'Add New Business',
             headerShown: true
@@ -59,7 +57,9 @@ export default function addBusiness() {
                 location,
                 about,
                 contact,
-                category: selectedCategory,
+                category: {
+                    id: selectedCategory
+                },
             })
         );
 
@@ -97,18 +97,24 @@ export default function addBusiness() {
       setWebsite('')
     }
 
-    const getCategory = async () => {
-        setCategory([])
-        const qry = query(collection(db, 'Category'))
-        const querySnapshot = await getDocs(qry)
-
-        querySnapshot.forEach(dc => {
-            setCategory(prev => [...prev, {
-                label: (dc.data()).name,
-                value: (dc.data()).name
-            }])
-        })
-    }
+    const fetchCategories = async () => {
+        try {
+            const response = await fetch(`${HOST_WITH_PORT}/api/businesses/categories`);
+            if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
+            }
+            const data = await response.json();            
+            const formattedCategories = data.map(category => ({
+                label: category.name,
+                value: category.id
+            }));
+            
+            setCategories(formattedCategories);
+        } catch (err) {
+            console.error('Error fetching categories:', err.message)
+            Alert.alert('Error', `Failed to fetch categories: ${err.message}`)
+        }
+    };
 
     const pictureImport = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -171,7 +177,7 @@ export default function addBusiness() {
                     <RNPickerSelect
                         placeholder={{ label: 'Select a Category...', value: null }}
                         onValueChange={(value) => setSelectedCategory(value)}
-                        items={category}
+                        items={categories}
                         style={pickerSelectStyles}
                         value={selectedCategory}
                     />

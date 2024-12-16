@@ -21,7 +21,7 @@ export default function BusinessList() {
             setBusinesses(data);
         } catch (err) {
             console.error('Error fetching businesses:', err.message)
-            Alert.alert('Error', `Failed to add business: ${err.message}`)
+            Alert.alert('Error', `Failed to fetch business: ${err.message}`)
         }
     };
 

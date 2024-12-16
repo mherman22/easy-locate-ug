@@ -4,25 +4,31 @@ import { collection, getDocs, query } from 'firebase/firestore'
 import { db } from '../../config/FirebaseConfig'
 import CategoryItem from './CategoryItem';
 import Colors from '../../constants/Colors';
+import { HOST_WITH_PORT } from '../../config/localhost';
 
 const { width } = Dimensions.get('window');
 
 export default function Category() {
     const [category, setCategory] = React.useState([]);
 
+    const fetchCategories = async () => {
+        try {
+            const response = await fetch(`${HOST_WITH_PORT}/api/businesses/categories`);
+            if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
+            }
+            const data = await response.json();
+            console.log("fetched categories: " + JSON.stringify(data));
+            setCategory(data);
+        } catch (err) {
+            console.error('Error fetching categories:', err.message)
+            Alert.alert('Error', `Failed to fetch category: ${err.message}`)
+        }
+    };
+
     React.useEffect(() => {
-        getCategory();
+        fetchCategories();
     }, []);
-
-    const getCategory = async() => {
-        setCategory([]);
-        const qry = query(collection(db, 'Category'));
-        const querySnapshot = await getDocs(qry);
-
-        querySnapshot.forEach(dc => {
-            setCategory(prev => [...prev, dc.data()]);
-        })
-    }
 
     return (
         <View style={styles.container}>
